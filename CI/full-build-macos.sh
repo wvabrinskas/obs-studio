@@ -223,6 +223,8 @@ install_cef() {
     ensure_dir ./build
     step "Run CMAKE..."
     cmake \
+        -DPROJECT_ARCH="arm64" \
+        -DCMAKE_OSX_ARCHITECTURES="arm64" \
         -DCMAKE_CXX_FLAGS="-std=c++11 -stdlib=libc++ -Wno-deprecated-declarations"\
         -DCMAKE_EXE_LINKER_FLAGS="-std=c++11 -stdlib=libc++"\
         -DCMAKE_OSX_DEPLOYMENT_TARGET=${MIN_MACOS_VERSION:-${CI_MIN_MACOS_VERSION}} \
@@ -271,13 +273,15 @@ configure_obs_build() {
     ensure_dir "${CHECKOUT_DIR}/${BUILD_DIR}"
 
     hr "Run CMAKE for OBS..."
-    cmake -DENABLE_SPARKLE_UPDATER=ON \
+    cmake -DENABLE_SPARKLE_UPDATER=OFF \
+        -DPROJECT_ARCH="arm64" \
+        -DCMAKE_OSX_ARCHITECTURES="arm64" \
         -DCMAKE_OSX_DEPLOYMENT_TARGET=${MIN_MACOS_VERSION:-${CI_MIN_MACOS_VERSION}} \
         -DQTDIR="/tmp/obsdeps" \
         -DSWIGDIR="/tmp/obsdeps" \
         -DDepsPath="/tmp/obsdeps" \
         -DVLCPath="${DEPS_BUILD_DIR}/vlc-${VLC_VERSION:-${CI_VLC_VERSION}}" \
-        -DBUILD_BROWSER=ON \
+        -DBUILD_BROWSER=OFF \
         -DBROWSER_LEGACY="$(test "${MACOS_CEF_BUILD_VERSION:-${CI_MACOS_CEF_VERSION}}" -le 3770 && echo "ON" || echo "OFF")" \
         -DWITH_RTMPS=ON \
         -DCEF_ROOT_DIR="${DEPS_BUILD_DIR}/cef_binary_${MACOS_CEF_BUILD_VERSION:-${CI_MACOS_CEF_VERSION}}_macosx64" \
@@ -317,7 +321,6 @@ bundle_dylibs() {
         ./OBS.app/Contents/PlugIns/mac-syphon.so
         ./OBS.app/Contents/PlugIns/mac-vth264.so
         ./OBS.app/Contents/PlugIns/mac-virtualcam.so
-        ./OBS.app/Contents/PlugIns/obs-browser.so
         ./OBS.app/Contents/PlugIns/obs-ffmpeg.so
         ./OBS.app/Contents/PlugIns/obs-filters.so
         ./OBS.app/Contents/PlugIns/obs-transitions.so
